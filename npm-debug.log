@@ -1,0 +1,27 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'init' ]
+2 info using npm@2.0.0
+3 info using node@v0.10.32
+4 verbose node symlink /usr/local/bin/node
+5 silly package data undefined
+6 info init written successfully
+7 verbose stack Error: Invalid name: "voronoi webgl"
+7 verbose stack     at ensureValidName (/usr/local/lib/node_modules/npm/node_modules/normalize-package-data/lib/fixer.js:315:15)
+7 verbose stack     at Object.module.exports.fixNameField (/usr/local/lib/node_modules/npm/node_modules/normalize-package-data/lib/fixer.js:204:5)
+7 verbose stack     at /usr/local/lib/node_modules/npm/node_modules/normalize-package-data/lib/normalize.js:30:38
+7 verbose stack     at Array.forEach (native)
+7 verbose stack     at normalize (/usr/local/lib/node_modules/npm/node_modules/normalize-package-data/lib/normalize.js:29:15)
+7 verbose stack     at final (/usr/local/lib/node_modules/npm/node_modules/read-package-json/read-json.js:342:33)
+7 verbose stack     at then (/usr/local/lib/node_modules/npm/node_modules/read-package-json/read-json.js:126:33)
+7 verbose stack     at /usr/local/lib/node_modules/npm/node_modules/read-package-json/read-json.js:266:40
+7 verbose stack     at evalmachine.<anonymous>:271:14
+7 verbose stack     at /usr/local/lib/node_modules/npm/node_modules/graceful-fs/graceful-fs.js:102:5
+8 verbose cwd /Users/ifjorissen/math385/finalproj
+9 error Darwin 14.1.0
+10 error argv "node" "/usr/local/bin/npm" "init"
+11 error node v0.10.32
+12 error npm  v2.0.0
+13 error Invalid name: "voronoi webgl"
+14 error If you need help, you may report this error at:
+14 error     <http://github.com/npm/npm/issues>
+15 verbose exit [ 1, true ]
