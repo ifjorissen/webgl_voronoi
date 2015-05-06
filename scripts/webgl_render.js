@@ -1,54 +1,45 @@
-var Context = (function ContextModule() {
-  var canvas;
-  function addToDom() {
-    canvas = document.createElement("canvas")
-    // canvas.style.position = "absolute"
-    // canvas.style.left = "0px"
-    // canvas.style.top = "0px"
-    // canvas.style.height = "100%"
-    // canvas.style.width = "100%"
-    // canvas.style.overflow = "hidden"
-    document.body.appendChild(canvas)
-    document.body.style.overflow = "hidden" //Prevent bounce
-    document.body.style.height = "100%"
-    document.body.style.width = "100%"
-    canvas.height = window.innerHeight
-    canvas.width = window.innerWidth
-    return canvas
-  }
-  function resize(){
-    console.log("resize");
-    canvas.height = window.innerHeight
-    canvas.width = window.innerWidth
-  }
-  return{
-    setup: function(){
-      console.log("setup called");
-      addToDom();
-    },
-    getCanvas: function(){
-      if (!canvas){
-        canvas = addToDom();
-      }
-      return canvas
-    }
-  }
-});
+var Context =  {
+  addToDom: function(container_id, canvas_id) {
+    this.canvas = document.createElement("canvas")
+    this.container = document.getElementById(container_id)
+    this.container.appendChild(this.canvas)
+
+    this.canvas.setAttribute("id", canvas_id)
+    this.canvas.height = this.container.clientHeight
+    this.canvas.width = this.container.clientWidth
+    console.log(this)
+    return this
+  },
+  resize: function(){
+    this.canvas.height = this.container.clientHeight
+    this.canvas.width = this.container.clientWidth
+  },
+}
+
+// WebGL = Object.create(Context)
 
 var WebGl = (function WebGlModule() {
-  var gl;
-  var options;
-
   function init() {
     console.log("initializing instance")
-    console.log(options||"no options provided... continuing with default")
-    var obj = Object.create(Context())
-    obj.setup()
-    var canvas = obj.getCanvas();
-    var gl = canvas.getContext("webgl") || 
-             canvas.getContext("experimental-webgl")
+    // console.log(options||"no options provided... continuing with default")
+    this.element = Object.create(Context)
+    this.element.addToDom(options.container_id, options.canvas_id)
+    console.log(this.element)
+    this.gl = element.canvas.getContext("webgl") || 
+         element.canvas.getContext("experimental-webgl")
     //ToDo: handle an error
-    return gl
+  }
+  function getGL () {
+    return this.gl
+  }
+  function getElement(){
+    return this.element
+  }  
+  function resize() {
+    element.resize()
+    gl.viewport(0, 0, (element.canvas.width)|0, (element.canvas.height)|0)
+    console.log("resize called")
+    draw()
   }
   function loadShaders(){
     console.log("loading shaders...")
@@ -79,7 +70,22 @@ var WebGl = (function WebGlModule() {
       gl.useProgram(shader)
     }
   }
-  function draw(){
+  function addPoint(x,y){
+    if (!this.points){
+      this.points = []
+      this.colors = []
+    }
+    this.points.push(x)
+    this.points.push(y)
+    this.points.push(0.0)
+
+    this.colors.push(Math.random())
+    this.colors.push(Math.random())
+    this.colors.push(Math.random())
+
+    draw(this.points, this.colors)
+  }
+  function draw(points, colors){
     console.log("draw called")
     var vertBuf = gl.createBuffer()
     var colorBuf = gl.createBuffer()
@@ -89,29 +95,33 @@ var WebGl = (function WebGlModule() {
     gl.clearColor(0.0, 0.0, 0.0, 1.0)
     gl.enableVertexAttribArray(posAL)
     gl.bindBuffer(gl.ARRAY_BUFFER, vertBuf)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0.0,0.0,0.0]), gl.STREAM_DRAW)
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(points), gl.STREAM_DRAW)
     gl.vertexAttribPointer(posAL, 3, gl.FLOAT, false, 0, 0)
 
     gl.enableVertexAttribArray(colorAL)
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuf)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0.3451, 1.0, 0.5450]), gl.STATIC_DRAW)
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW)
     gl.vertexAttribPointer(colorAL, 3, gl.FLOAT, false, 0, 0)
 
     //Draw the points
-    gl.drawArrays(gl.POINTS, 0, 1)
+    gl.drawArrays(gl.POINTS, 0, points.length/3)
     gl.disableVertexAttribArray(vertBuf)
     gl.disableVertexAttribArray(colorBuf)
   }
   return{
-    gl: gl,
     begin: function(opts){
-      options = opts
-      if (!gl){
-        gl = init();
+      if (!this.element){
+        init();
+        this.element = getElement()
+        if (!this.gl){
+          this.gl = getGL()
+        }
       }
       loadShaders();
     },
+    addPoint: addPoint,
     draw: draw,
+    resize: resize,
   }
 });
 
