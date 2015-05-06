@@ -2,28 +2,24 @@ var Context = (function ContextModule() {
   var canvas;
   function addToDom() {
     canvas = document.createElement("canvas")
-    canvas.style.position = "absolute"
-    canvas.style.left = "0px"
-    canvas.style.top = "0px"
-    canvas.style.height = "100%"
-    canvas.style.width = "100%"
-    canvas.style.overflow = "hidden"
+    // canvas.style.position = "absolute"
+    // canvas.style.left = "0px"
+    // canvas.style.top = "0px"
+    // canvas.style.height = "100%"
+    // canvas.style.width = "100%"
+    // canvas.style.overflow = "hidden"
     document.body.appendChild(canvas)
     document.body.style.overflow = "hidden" //Prevent bounce
-    // document.body.style.height = "100%"
-    // document.body.style.width = "100%"
-    canvas.width = canvas.clientWidth
-    canvas.height = canvas.clientHeight
+    document.body.style.height = "100%"
+    document.body.style.width = "100%"
+    canvas.height = window.innerHeight
+    canvas.width = window.innerWidth
     return canvas
   }
   function resize(){
     console.log("resize");
-    var nw = canvas.clientWidth |0
-    var nh = canvas.clientHeight |0
-    canvas.width = nw
-    canvas.height = nh
-    canvas.style.width = nw + 'px'
-    canvas.style.height = nh + 'px'
+    canvas.height = window.innerHeight
+    canvas.width = window.innerWidth
   }
   return{
     setup: function(){

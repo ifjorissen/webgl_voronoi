@@ -15,3 +15,8 @@ window.onload = function init (){
 	webgl.begin(options)
 	webgl.draw()
 };
+
+
+window.addEventListener("resize", function(){
+    webgl.resize()
+});
