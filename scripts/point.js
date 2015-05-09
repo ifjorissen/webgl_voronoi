@@ -31,6 +31,9 @@ var Point = {
 	dist: function(p){
 		var nv = this.minus(p)
     return nv.norm()
+	},
+	toArray: function(){
+		return [this.x, this.y, this.z]
 	}
 }
 

@@ -10,6 +10,6 @@ varying vec3 fragColor;
 void main() {
   // gl_Position = vec4(a_position+u_velocity), 1.0);
   gl_Position = vec4(a_position, 1.0);
-  gl_PointSize = 25.0;
+  gl_PointSize = 15.0;
   fragColor = a_color;
 }
