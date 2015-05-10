@@ -21,8 +21,8 @@ var Context =  {
 
 var WebGl = (function WebGlModule() {
   var scan = false
-  var sites = []
-  var colors = []
+  // var sites = []
+  // var scolors = []
   var voronoi =  Object.create(Voronoi)
   var gl
   var element = Object.create(Context)
@@ -74,35 +74,13 @@ var WebGl = (function WebGlModule() {
   }
   function startVoronoi(){
     scan = true
-    var e1 = Object.create(Point)
-    e1.init(-1.0,1.0,0.0)
-
-    var e2 = Object.create(Point)
-    e2.init(1.0,1.0,0.0)
-
-    var vec = Object.create(Vector)
-    vec.init(0.0, -.1, 0.0)
-
-    voronoi.scanvector = vec
-
-    voronoi.scanline.push(e1)
-    voronoi.scanline.push(e2)
-
-    voronoi.begin()
+    voronoi.scan()
 
     // voronoi.
     draw()
   }
   function addPoint(x,y){
-    var p = Object.create(Point)
-    p.init(x,y,0.0)
-    voronoi.sites.push(p)
-    sites.push(x, y, 0.0)
-
-    var c = voronoi.random_color()
-    colors.push(c[0], c[1], c[2])
-    voronoi.scolor[p] = c
-
+    voronoi.addSite(x, y, 0.0)
     draw()
   }
   function tick(){
@@ -117,20 +95,21 @@ var WebGl = (function WebGlModule() {
     var colorBuf = gl.createBuffer()
     var colorAL = gl.getAttribLocation(shader, "a_color")
     var posAL = gl.getAttribLocation(shader, "a_position")
+    console.log(voronoi.siteBuffer)
 
     gl.enableVertexAttribArray(posAL)
     gl.bindBuffer(gl.ARRAY_BUFFER, vertBuf)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(sites), gl.STATIC_DRAW)
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(voronoi.siteBuffer), gl.STATIC_DRAW)
     gl.vertexAttribPointer(posAL, 3, gl.FLOAT, false, 0, 0)
 
     gl.enableVertexAttribArray(colorAL)
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuf)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW)
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(voronoi.colorBuffer), gl.STATIC_DRAW)
     gl.vertexAttribPointer(colorAL, 3, gl.FLOAT, false, 0, 0)
 
     //Draw the sites
-    if (sites.length > 0){
-      gl.drawArrays(gl.POINTS, 0, sites.length/3)
+    if (voronoi.siteBuffer.length > 0){
+      gl.drawArrays(gl.POINTS, 0, voronoi.siteBuffer.length/3)
     }
     gl.disableVertexAttribArray(vertBuf)
     gl.disableVertexAttribArray(colorBuf)
@@ -140,8 +119,8 @@ var WebGl = (function WebGlModule() {
     var colorBuf = gl.createBuffer()
     var colorAL = gl.getAttribLocation(shader, "a_color")
     var posAL = gl.getAttribLocation(shader, "a_position")
-    var scanline = voronoi.scanlineToBuf()
-    var color = [1.0,0.0,.5, 1.0,0.0,.5]
+    var scanline = voronoi.scanlineToBuffer()["scanline"]
+    var colors = voronoi.scanlineToBuffer()["colors"]
 
     gl.enableVertexAttribArray(posAL)
     gl.bindBuffer(gl.ARRAY_BUFFER, vertBuf)
@@ -150,7 +129,7 @@ var WebGl = (function WebGlModule() {
 
     gl.enableVertexAttribArray(colorAL)
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuf)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(color), gl.STATIC_DRAW)
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW)
     gl.vertexAttribPointer(colorAL, 3, gl.FLOAT, false, 0, 0)
     gl.lineWidth(10)
     //Draw the scanline
@@ -177,6 +156,7 @@ var WebGl = (function WebGlModule() {
         this.element = getElement()
       }
       loadShaders()
+      voronoi.begin()
     },
     addPoint: addPoint,
     resize: resize,
