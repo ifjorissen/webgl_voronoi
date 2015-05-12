@@ -32,7 +32,7 @@ var Beach = {
     var cBuf = []
     var c = this.focus.c
     this.arcpts = []
-    for(i = -1.0; i<=1.0; i+=.1){
+    for(i = -1.0; i<=1.0; i+=.01){
       var y = this.arceqn(i)
       // console.log("x: " + i + " y: " + y)
       this.arcpts.push(y)
@@ -124,7 +124,7 @@ var Voronoi = (function(){
   }
 
   function createScanLine(){
-    var c = random_color()
+    var c = [1.0, 1.0, 1.0]
     //create the two endpoints for the scanline
     var e1 = Object.create(Point)
     e1.init(-1.0,1.0,0.0)
@@ -134,7 +134,7 @@ var Voronoi = (function(){
 
     //create the movement (down) scan vector
     var vec = Object.create(Vector)
-    vec.init(0.0, -.05, 0.0)
+    vec.init(0.0, -.0025, 0.0)
     scanline.init(e1, e2, vec, c)
   }
 
@@ -152,15 +152,6 @@ var Voronoi = (function(){
     }
   }
 
-  // function sitesToBuffer(){
-  //   for (i = 0; i < sites.length; i++){
-  //     siteBuffer.push.apply(site.p.toArray())
-  //     colorBuffer.push.apply(site.c)
-  //   }
-  // }
-  function eventToBuffer(){
-
-  }
   function beachlineToBuffer(){
     var bbuf = []
     console.log(beaches)
@@ -201,10 +192,6 @@ var Voronoi = (function(){
         console.log("update sites func " + site.x)
         site.update(scanline)
       })
-      // for (i = 0; i < sites.length; i++){
-      //   console.log("update sites func " + sites[i].x)
-      //   sites[i].update(scanline)
-      // }
 
       //sort the priority queue according to (max) distance to scanline
       // this way we can call pq.pop()
@@ -212,7 +199,7 @@ var Voronoi = (function(){
         return b.dist2scan - a.dist2scan
       })
 
-      if ((pq.length > 0) && (pq[pq.length-1].dist2scan < Math.abs(scanline.dy))){
+      if ((pq.length > 0) && (pq[pq.length-1].dist2scan <= Math.abs(scanline.dy/2))){
         console.log("site event")
         processEvent()
       }
@@ -221,11 +208,6 @@ var Voronoi = (function(){
         console.log("update beach " + beach.focus.x)
         beach.update()
       })
-      // for (i = 0; i < beaches.length; i++){
-      //   console.log("update beaches func " + beaches[i].focus.x)
-      //   beaches[i].update()
-      // }
-
     }
   }
 

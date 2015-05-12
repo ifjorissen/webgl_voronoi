@@ -21,8 +21,9 @@ var Context =  {
 
 var WebGl = (function WebGlModule() {
   var scan = false
-  // var sites = []
-  // var scolors = []
+  var line_shader = null
+  var point_shader = null
+
   var voronoi =  Object.create(Voronoi)
   var gl
   var element = Object.create(Context)
@@ -41,17 +42,13 @@ var WebGl = (function WebGlModule() {
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
     draw()
   }
-  function loadShaders(){
+  function loadShaders(VERT_SRC, FRAG_SRC){
     console.log("loading shaders...")
     if (!options){
       console.log("error loading shaders")
       alert("no shaders provided!")
     }
     else{
-      // var gl = this.gl
-      var FRAG_SRC = options.f_src
-      var VERT_SRC = options.v_src
-
       //Create fragment shader
       var frags = gl.createShader(gl.FRAGMENT_SHADER)
       gl.shaderSource(frags, FRAG_SRC)
@@ -69,14 +66,14 @@ var WebGl = (function WebGlModule() {
       gl.attachShader(shader, frags)
       gl.attachShader(shader, verts)
       gl.linkProgram(shader)
-      gl.useProgram(shader)
+
+      return shader
     }
   }
   function startVoronoi(){
     scan = true
     voronoi.scan()
 
-    // voronoi.
     draw()
   }
   function addPoint(x,y){
@@ -93,13 +90,12 @@ var WebGl = (function WebGlModule() {
     draw()
   }
   function drawBeachLine(){
+    gl.useProgram(line_shader)
     var vertBuf = gl.createBuffer()
     var colorBuf = gl.createBuffer()
     var colorAL = gl.getAttribLocation(shader, "a_color")
     var posAL = gl.getAttribLocation(shader, "a_position")
     var beachBuffers = voronoi.beachlineToBuffer()
-    console.log(beachBuffers)
-    // var colors = voronoi.beachlineToBuffer()["color"]
 
     beachBuffers.forEach(function (beachBuf){
       gl.enableVertexAttribArray(posAL)
@@ -112,13 +108,15 @@ var WebGl = (function WebGlModule() {
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(beachBuf["color"]), gl.STATIC_DRAW)
       gl.vertexAttribPointer(colorAL, 3, gl.FLOAT, false, 0, 0)
       gl.lineWidth(3)
-      //Draw the scanline
-      gl.drawArrays(gl.LINE_STRIP, 0, 20)
+
+      gl.drawArrays(gl.LINE_STRIP, 0, 200)
       gl.disableVertexAttribArray(vertBuf)
       gl.disableVertexAttribArray(colorBuf)
     })
   }
   function drawSites(){
+    console.log(point_shader)
+    gl.useProgram(point_shader)
     var vertBuf = gl.createBuffer()
     var colorBuf = gl.createBuffer()
     var colorAL = gl.getAttribLocation(shader, "a_color")
@@ -142,6 +140,7 @@ var WebGl = (function WebGlModule() {
     gl.disableVertexAttribArray(colorBuf)
   }
   function drawScanline(){
+    gl.useProgram(line_shader)
     var vertBuf = gl.createBuffer()
     var colorBuf = gl.createBuffer()
     var colorAL = gl.getAttribLocation(shader, "a_color")
@@ -174,8 +173,7 @@ var WebGl = (function WebGlModule() {
     }
     // console.log("draw called")
   }
-
-  //to do: reset function
+  
   return{
     begin: function(opts){
       if (!this.element){
@@ -183,7 +181,9 @@ var WebGl = (function WebGlModule() {
         init()
         this.element = getElement()
       }
-      loadShaders()
+      point_shader = loadShaders(opts["vpt_src"], opts["fpt_src"])
+      line_shader = loadShaders(opts["v_src"], opts["f_src"])
+      console.log(point_shader)
       voronoi.begin()
     },
     addPoint: addPoint,

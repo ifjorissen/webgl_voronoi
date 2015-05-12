@@ -2,6 +2,8 @@ var fs = require("fs")
 var webglwrap = require("./webgl_render")
 var VERT_SRC = fs.readFileSync(__dirname + '/shaders/vert_shader.glsl', 'utf8')
 var FRAG_SRC = fs.readFileSync(__dirname + '/shaders/frag_shader.glsl', 'utf8')
+var VERTPT_SRC = fs.readFileSync(__dirname + '/shaders/vertpt_shader.glsl', 'utf8')
+var FRAGPT_SRC = fs.readFileSync(__dirname + '/shaders/fragpt_shader.glsl', 'utf8')
 
 var webgl = Object.create(webglwrap)
 window.webgl = webgl
@@ -15,17 +17,19 @@ window.requestAnimFrame = (function() {
          window.oRequestAnimationFrame ||
          window.msRequestAnimationFrame ||
          function(callback, element) {
-           return window.setTimeout(callback, 1000/10);
+           return window.setTimeout(callback, 1000);
          };
 })();
 
 window.onload = function init (){
 	console.log("init called")
 	options = {
-		v_src: VERT_SRC,
-		f_src: FRAG_SRC,
-		container_id: "voronoi-wrapper",
-		canvas_id: "voronoi",
+		"v_src": VERT_SRC,
+		"f_src": FRAG_SRC,
+		"vpt_src": VERTPT_SRC,
+		"fpt_src": FRAGPT_SRC,
+		"container_id": "voronoi-wrapper",
+		"canvas_id": "voronoi",
 	}
 	webgl.begin(options)
 	var canvas = webgl.element.canvas
@@ -70,12 +74,12 @@ window.onload = function init (){
 	})
 
 	webgl.tick()
-	// function update(){
-	// 	console.log("update")
-	// 	webgl.tick()
-	// 	requestAnimationFrame(update)
-	// }
-	// update()
+	function update(){
+		console.log("update")
+		webgl.tick()
+		requestAnimationFrame(update)
+	}
+	update()
 }
 
 window.addEventListener("resize", function(){

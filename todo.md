@@ -9,3 +9,7 @@ voronoi initialization
 voronoi calculation styles
 stretch: 3d???? or something with glsl?
 stretch2: quaternions.js??
+
+todo: 
+another shader so the points are circles (done)
+reset function
