@@ -6,8 +6,12 @@ var BST = require("./binary_search_tree")["BinarySearchTree"]
 
 var Beach = {
   init: function(site, scanline){
-    this.breakl = -1.0
-    this.breakr = 1.0
+    this.breakl = Object.create(Point)
+    this.breakl.init(-1.0, 1.0)
+
+    this.breakr = Object.create(Point)
+    this.breakr.init(1.0, 1.0)
+
     this.directrix = scanline
     this.focus = site
   },
@@ -32,12 +36,14 @@ var Beach = {
     var cBuf = []
     var c = this.focus.c
     this.arcpts = []
-    for(i = -1.0; i<=1.0; i+=.01){
-      var y = this.arceqn(i)
-      // console.log("x: " + i + " y: " + y)
-      this.arcpts.push(y)
-      cBuf.push(c[0], c[1], c[2])
-      arcBuf.push(i, y, 0.0)
+    if (this.focus.y >= this.directrix.y){
+      for(i = this.breakl.x; i<this.breakr.x; i+=.01){
+        var y = this.arceqn(i)
+        // console.log("x: " + i + " y: " + y)
+        this.arcpts.push(y)
+        cBuf.push(c[0], c[1], c[2])
+        arcBuf.push(i, y, 0.0)
+      }
     }
     return {
       "lines": arcBuf,
@@ -106,6 +112,12 @@ var Voronoi = (function(){
     return colors[(Math.random()*colors.length)|0]
   }
 
+  // function updateBreakpoints(){
+  //   beaches.forEach(function(beach){
+  //     beachLine.search(beach.focus.x)
+  //   })
+  // }
+
   function addSite(x,y,z){
     var p = Object.create(Point)
     p.init(x, y, z)
@@ -157,10 +169,10 @@ var Voronoi = (function(){
     console.log(beaches)
 
     beaches.forEach(function(beach){
-      console.log("beach toBuf " + beach.focus.x)
+      // console.log("beach toBuf " + beach.focus.x)
       var res = beach.toBuffer()
       bbuf.push(res)
-      console.log(bbuf)
+      // console.log(bbuf)
     })
     return bbuf
   }
@@ -187,9 +199,10 @@ var Voronoi = (function(){
     if (!scanFinished()){
       //update the scanline
       scanline.update()
+
       //update every site's distance
       sites.forEach(function(site){
-        console.log("update sites func " + site.x)
+        // console.log("update sites func " + site.x)
         site.update(scanline)
       })
 
@@ -205,7 +218,7 @@ var Voronoi = (function(){
       }
 
       beaches.forEach(function(beach){
-        console.log("update beach " + beach.focus.x)
+        // console.log("update beach " + beach.focus.x)
         beach.update()
       })
     }

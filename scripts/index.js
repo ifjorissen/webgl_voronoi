@@ -61,10 +61,14 @@ window.onload = function init (){
 		webgl.addPoint(x,y)
 	})
 
+	var pause = false
+
 	var gen_btn = document.getElementById("generate")
 	gen_btn.addEventListener("click", function(){
-		console.log("start diagram generation")
+		// console.log("start diagram generation")
 		gen_btn.innerText = "Generating Diagram ...."
+		pause_btn.innerText = "Pause"
+		pause = false
 		webgl.scan()
 	})
 
@@ -73,10 +77,19 @@ window.onload = function init (){
 		console.log("should reset")
 	})
 
-	webgl.tick()
+	var pause_btn = document.getElementById("pause")
+	pause_btn.addEventListener("click", function(){
+		// console.log("should pause")
+		pause_btn.innerText = "Paused"
+		gen_btn.innerText = "Resume"
+		pause = true
+	})
+
+	// webgl.tick()
 	function update(){
-		console.log("update")
-		webgl.tick()
+		if (!pause){
+			webgl.tick()
+		}
 		requestAnimationFrame(update)
 	}
 	update()

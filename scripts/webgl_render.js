@@ -109,13 +109,12 @@ var WebGl = (function WebGlModule() {
       gl.vertexAttribPointer(colorAL, 3, gl.FLOAT, false, 0, 0)
       gl.lineWidth(3)
 
-      gl.drawArrays(gl.LINE_STRIP, 0, 200)
+      gl.drawArrays(gl.LINE_STRIP, 0, beachBuf["lines"].length/3)
       gl.disableVertexAttribArray(vertBuf)
       gl.disableVertexAttribArray(colorBuf)
     })
   }
   function drawSites(){
-    console.log(point_shader)
     gl.useProgram(point_shader)
     var vertBuf = gl.createBuffer()
     var colorBuf = gl.createBuffer()
@@ -173,7 +172,7 @@ var WebGl = (function WebGlModule() {
     }
     // console.log("draw called")
   }
-  
+
   return{
     begin: function(opts){
       if (!this.element){
@@ -183,7 +182,6 @@ var WebGl = (function WebGlModule() {
       }
       point_shader = loadShaders(opts["vpt_src"], opts["fpt_src"])
       line_shader = loadShaders(opts["v_src"], opts["f_src"])
-      console.log(point_shader)
       voronoi.begin()
     },
     addPoint: addPoint,

@@ -15,7 +15,10 @@ var BinarySearchTree = (function(){
 		newnode.init(null, key, val) 
 		return newnode
 	}
-	function search(node, val){
+	/*
+	Searches for the node at an expected value
+	*/
+	function searchVal(node, val){
 		console.log("search")
 		if (node === null){
 			return null
@@ -34,10 +37,27 @@ var BinarySearchTree = (function(){
 			}
 		}
 	}
+	// function searchRange(node, val){
+	// 	if(node.val === val){
+	// 		return node
+	// 	}
+	// 	else{
+	// 	}
+	// }
+	function isLeaf(node){
+		if ((node.left===null) && (node.right===null)){
+			return true
+		} 
+		else{
+			return false
+		}
+	}
 	function insert(pnode, node, key, val){
 		if (node === null){
+			console.log(pnode)
 			var newnode = Object.create(Node)
 			newnode.init(pnode, key, val)
+			console.log(newnode)
 			return newnode
 		}
 		else{
@@ -74,14 +94,14 @@ var BinarySearchTree = (function(){
 			outputTree(node.right) 
 		}
 	}
-	function getLeaves(){
+	// function getLeaves(){
 
-	}
+	// }
 	return{
 		init: function(key, val){
 			this.root = init(key, val)
 		},
-		search: function(val){
+		searchVal: function(val){
 			var res = search(this.root, val)
 			return res
 		},
@@ -94,10 +114,11 @@ var BinarySearchTree = (function(){
 			}
 		},
 		root: this.root,
-		postOrder: function(){
-			console.log("postOrder")
-			postOrder(this.root)
-		},
+		isLeaf: isLeaf
+		// postOrder: function(){
+		// 	console.log("postOrder")
+		// 	postOrder(this.root)
+		// },
 	}
 })();
 
