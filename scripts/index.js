@@ -9,7 +9,6 @@ window.webgl = webgl
 
 //cross-browser request animation frame solution
 window.requestAnimFrame = (function() {
-	console.log("?")
   return window.requestAnimationFrame ||
          window.webkitRequestAnimationFrame ||
          window.mozRequestAnimationFrame ||
@@ -54,7 +53,7 @@ window.onload = function init (){
 		x = (x - canvas.width / 2) / (canvas.width / 2);
 		y = (canvas.height / 2 - y) / (canvas.height / 2);
 
-		console.log("clicked x: " + x + " y: " + y)
+		// console.log("clicked x: " + x + " y: " + y)
 		webgl.addPoint(x,y)
 	})
 

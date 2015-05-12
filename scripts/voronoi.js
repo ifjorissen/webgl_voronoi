@@ -4,14 +4,61 @@ var Vector = require("./vector")
 var Node = require("./binary_search_tree")["Node"]
 var BST = require("./binary_search_tree")["BinarySearchTree"]
 
+var Beach = {
+  init: function(site, scanline){
+    this.breakl = -1.0
+    this.breakr = 1.0
+    this.directrix = scanline
+    this.focus = site
+  },
+
+  arceqn: function(x){
+    var a = this.focus.x
+    var b = this.focus.y
+    var c = this.directrix.y
+    var verty = b - (this.focus.dist2scan / 2)
+    /*
+    Std vertex form for a parabola: y = a(x-h)^2 + k for a parabola with a vertex (h,k)
+    */
+    var y = (1/(2*(b-c))) * ((x-a)*(x-a)) + (1/2)*(b+c)
+    // var y = ((x-a)*(x-a) + b*b - c*c)/(2*(b-c))
+    // var y = (a*a - 2*a*x + b*b - c*c + x*x)/(2*b - 2*c)
+    return y
+  },
+
+  update: function(){
+    // console.log("beach update " + this.focus.x)
+    var arcBuf = []
+    var cBuf = []
+    var c = this.focus.c
+    this.arcpts = []
+    for(i = -1.0; i<=1.0; i+=.1){
+      var y = this.arceqn(i)
+      // console.log("x: " + i + " y: " + y)
+      this.arcpts.push(y)
+      cBuf.push(c[0], c[1], c[2])
+      arcBuf.push(i, y, 0.0)
+    }
+    return {
+      "lines": arcBuf,
+      "color": cBuf
+    }
+  },
+  toBuffer: function(){
+    // console.log("beach tobuf " + this.focus.x)
+    return this.update()
+  }
+}
+
 var Site = {
   init: function(point, color){
     this.p = point
     this.c = color
     this.x = point.x
+    this.y = point.y
   },
   dist_to_scanline: function(scanl){
-    this.dist2scan = Math.abs(this.p.y - scanl.y)
+    this.dist2scan = Math.abs(this.y - scanl.y)
   },
   update: function(scanl) {
     this.dist_to_scanline(scanl)
@@ -30,6 +77,7 @@ var Scanline = {
   update: function(){
     this.e1 = this.e1.plus(this.vec)
     this.e2 = this.e2.plus(this.vec)
+    this.y = this.e1.y
   }
 }
 //To Do:
@@ -38,7 +86,6 @@ var Voronoi = (function(){
   var siteBuffer = []
   var colorBuffer = []
   var colors = [
-      [0.0,0.0,0.0],
       [0.3451, 1.0, 0.5450],
       [1.0, 0.4313, 0.3411],
       [1.0, 0.8862, 0.3725],
@@ -47,12 +94,14 @@ var Voronoi = (function(){
       [1.0, 0.0, 1.0],
       [0.3804, 0.7647, 1.0]
   ]
+  // to do: add a boundary var instead of -1.0, 1.0, etc
   scanline = Object.create(Scanline)
   sites = []
   edges = []
   beachLine = Object.create(BST)
   pq = []
-
+  beaches = []
+ 
   function random_color(){
     return colors[(Math.random()*colors.length)|0]
   }
@@ -65,8 +114,6 @@ var Voronoi = (function(){
 
     siteBuffer.push(x, y, z)
     colorBuffer.push(c[0], c[1], c[2])
-    console.log(siteBuffer)
-    console.log(colorBuffer)
 
     var site = Object.create(Site)
     site.init(p, c)
@@ -74,7 +121,6 @@ var Voronoi = (function(){
 
     sites.push(site)
     pq.push(site)
-    console.log(sites)
   }
 
   function createScanLine(){
@@ -88,7 +134,7 @@ var Voronoi = (function(){
 
     //create the movement (down) scan vector
     var vec = Object.create(Vector)
-    vec.init(0.0, -.1, 0.0)
+    vec.init(0.0, -.05, 0.0)
     scanline.init(e1, e2, vec, c)
   }
 
@@ -115,8 +161,17 @@ var Voronoi = (function(){
   function eventToBuffer(){
 
   }
-  function beachLineToBuffer(){
+  function beachlineToBuffer(){
+    var bbuf = []
+    console.log(beaches)
 
+    beaches.forEach(function(beach){
+      console.log("beach toBuf " + beach.focus.x)
+      var res = beach.toBuffer()
+      bbuf.push(res)
+      console.log(bbuf)
+    })
+    return bbuf
   }
   function scanFinished(){
     if (scanline.y < (-1.0 - scanline.dy)){
@@ -128,22 +183,49 @@ var Voronoi = (function(){
     }
   }
 
+  function processEvent(){
+    console.log("processEvent")
+    var site = pq.pop()
+    var beach = Object.create(Beach)
+    beach.init(site, scanline)
+    beachLine.insert(beach, beach.focus.x)
+    beaches.push(beach)
+  }
+
   function update(){
     if (!scanFinished()){
       //update the scanline
       scanline.update()
-
       //update every site's distance
-      for (i = 0; i<sites.length; i++){
-        sites[i].update(scanline)
+      sites.forEach(function(site){
+        console.log("update sites func " + site.x)
+        site.update(scanline)
+      })
+      // for (i = 0; i < sites.length; i++){
+      //   console.log("update sites func " + sites[i].x)
+      //   sites[i].update(scanline)
+      // }
+
+      //sort the priority queue according to (max) distance to scanline
+      // this way we can call pq.pop()
+      pq.sort(function(a,b){
+        return b.dist2scan - a.dist2scan
+      })
+
+      if ((pq.length > 0) && (pq[pq.length-1].dist2scan < Math.abs(scanline.dy))){
+        console.log("site event")
+        processEvent()
       }
 
-      //sort the priority queue according to (min) distance to scanline
-      pq.sort(function(a,b){
-        console.log(a)
-        return a.dist2scan - b.dist2scan
+      beaches.forEach(function(beach){
+        console.log("update beach " + beach.focus.x)
+        beach.update()
       })
-      console.log(pq)
+      // for (i = 0; i < beaches.length; i++){
+      //   console.log("update beaches func " + beaches[i].focus.x)
+      //   beaches[i].update()
+      // }
+
     }
   }
 
@@ -153,13 +235,14 @@ var Voronoi = (function(){
   	  sweep line moves from the top to the bottom of the diagram
       O(n*logn)
   	*/
-    console.log("scan called")
+    // console.log("scan called")
   }
   return{
     siteBuffer: siteBuffer,
     colorBuffer: colorBuffer,
     addSite: addSite,
     scanlineToBuffer: scanlineToBuffer,
+    beachlineToBuffer: beachlineToBuffer,
     update: update,
     scan: scan,
     begin: function(){

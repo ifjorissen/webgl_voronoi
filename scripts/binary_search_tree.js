@@ -1,6 +1,7 @@
 var Node = {
-	init: function(val){
-		// this.key = key
+	init: function(pnode, key, val){
+		this.key = key
+		this.parent = pnode
 		this.val = val
 		this.left = null
 		this.right = null
@@ -9,10 +10,10 @@ var Node = {
 
 
 var BinarySearchTree = (function(){
-	function init(val){
+	function init(key, val){
 		var newnode = Object.create(Node)
-		newnode.init(val) 
-		this.root = newnode
+		newnode.init(null, key, val) 
+		return newnode
 	}
 	function search(node, val){
 		console.log("search")
@@ -21,7 +22,6 @@ var BinarySearchTree = (function(){
 		}
 		else{
 			if(val === node.val){
-				console.log("!")
 				return node
 			}
 			else{
@@ -34,22 +34,30 @@ var BinarySearchTree = (function(){
 			}
 		}
 	}
-	function insert(node, val){
-		console.log("insert " + val)
+	function insert(pnode, node, key, val){
 		if (node === null){
 			var newnode = Object.create(Node)
-			newnode.init(val)
+			newnode.init(pnode, key, val)
 			return newnode
 		}
 		else{
+
 			if (val <= node.val){
-				node.left = insert(node.left, val)
+				console.log("less " + node.val)
+				// console.log(node)
+				node.left = insert(node, node.left, key, val)
 			}
 			else{
-				node.right = insert(node.right, val)
+				console.log("more " + node.val)
+				// console.log(node)
+				node.right = insert(node, node.right, key, val)
 			}
+			console.log(node)
 			return node
 		}
+	}
+	function remove(val){
+		
 	}
 	function outputTree(node){
 		if (node.left !== null){
@@ -63,27 +71,33 @@ var BinarySearchTree = (function(){
 	function postOrder(node){
 		if(node !== null){
 			outputTree(node.left)
-			outputTree(node.right)
-			console.log(node.val); 
+			outputTree(node.right) 
 		}
 	}
+	function getLeaves(){
+
+	}
 	return{
-		init: init,
+		init: function(key, val){
+			this.root = init(key, val)
+		},
 		search: function(val){
 			var res = search(this.root, val)
 			return res
 		},
-		insert: function(val){
-			console.log("yuh")
-			console.log(this.root)
-			insert(this.root, val)
+		insert: function(key, val){
+			if (this.root == null){
+				this.root = init(key, val)
+			}
+			else{
+				insert(null, this.root, key, val)
+			}
 		},
 		root: this.root,
 		postOrder: function(){
 			console.log("postOrder")
-			console.log(this.root)
 			postOrder(this.root)
-		}
+		},
 	}
 })();
 
@@ -102,16 +116,17 @@ var BinarySearchTree = (function(){
 // n5.init(5)
 
 
-var bst = Object.create(BinarySearchTree)
-bst.init(10)
-bst.insert(5)
-bst.insert(12)
-bst.insert(1)
-bst.insert(8)
-bst.postOrder(bst.root)
-var s = bst.search(7)
-console.log(s)
-console.log(bst.root)
+// var bst = Object.create(BinarySearchTree)
+// bst.init('a', 10)
+// bst.insert('b', 5)
+// bst.insert('c', 12)
+// bst.insert('d', 1)
+// bst.insert('e', 8)
+// console.log(bst)
+// bst.postOrder(bst.root)
+// var s = bst.search(7)
+// console.log(s)
+// console.log(bst.root)
 
 module.exports = {
 	"Node": Node,

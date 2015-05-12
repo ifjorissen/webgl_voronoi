@@ -80,22 +80,49 @@ var WebGl = (function WebGlModule() {
     draw()
   }
   function addPoint(x,y){
-    voronoi.addSite(x, y, 0.0)
-    draw()
+    if (!scan){
+      voronoi.addSite(x, y, 0.0)
+      draw()
+    }
   }
   function tick(){
-    console.log("tick")
+    // console.log("tick")
     if(scan){
       voronoi.update()
     }
     draw()
+  }
+  function drawBeachLine(){
+    var vertBuf = gl.createBuffer()
+    var colorBuf = gl.createBuffer()
+    var colorAL = gl.getAttribLocation(shader, "a_color")
+    var posAL = gl.getAttribLocation(shader, "a_position")
+    var beachBuffers = voronoi.beachlineToBuffer()
+    console.log(beachBuffers)
+    // var colors = voronoi.beachlineToBuffer()["color"]
+
+    beachBuffers.forEach(function (beachBuf){
+      gl.enableVertexAttribArray(posAL)
+      gl.bindBuffer(gl.ARRAY_BUFFER, vertBuf)
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(beachBuf["lines"]), gl.STREAM_DRAW)
+      gl.vertexAttribPointer(posAL, 3, gl.FLOAT, false, 0, 0)
+
+      gl.enableVertexAttribArray(colorAL)
+      gl.bindBuffer(gl.ARRAY_BUFFER, colorBuf)
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(beachBuf["color"]), gl.STATIC_DRAW)
+      gl.vertexAttribPointer(colorAL, 3, gl.FLOAT, false, 0, 0)
+      gl.lineWidth(3)
+      //Draw the scanline
+      gl.drawArrays(gl.LINE_STRIP, 0, 20)
+      gl.disableVertexAttribArray(vertBuf)
+      gl.disableVertexAttribArray(colorBuf)
+    })
   }
   function drawSites(){
     var vertBuf = gl.createBuffer()
     var colorBuf = gl.createBuffer()
     var colorAL = gl.getAttribLocation(shader, "a_color")
     var posAL = gl.getAttribLocation(shader, "a_position")
-    console.log(voronoi.siteBuffer)
 
     gl.enableVertexAttribArray(posAL)
     gl.bindBuffer(gl.ARRAY_BUFFER, vertBuf)
@@ -131,7 +158,7 @@ var WebGl = (function WebGlModule() {
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuf)
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW)
     gl.vertexAttribPointer(colorAL, 3, gl.FLOAT, false, 0, 0)
-    gl.lineWidth(10)
+    gl.lineWidth(5)
     //Draw the scanline
     gl.drawArrays(gl.LINES, 0, 2)
     gl.disableVertexAttribArray(vertBuf)
@@ -143,8 +170,9 @@ var WebGl = (function WebGlModule() {
     drawSites()
     if(scan){
       drawScanline()
+      drawBeachLine()
     }
-    console.log("draw called")
+    // console.log("draw called")
   }
 
   //to do: reset function
