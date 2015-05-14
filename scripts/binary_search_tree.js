@@ -13,7 +13,7 @@ var Node = {
 var BinarySearchTree = (function(){
 	function init(val){
 		var newnode = Object.create(Node)
-		newnode.init(null, val) 
+		newnode.init(null, val)
 		return newnode
 	}
 	/*
@@ -21,30 +21,31 @@ var BinarySearchTree = (function(){
 	*/
 	function searchVal(node, val){
 		console.log("search")
-		if (node === null){
+		console.log(node)
+		if (node == null){
 			return null
 		}
 		else{
+			console.log("else search")
+			console.log(node)
+			console.log(val)
 			if(val === node.val){
 				return node
 			}
 			else{
-				if (val <= node.val){
-					return search(node.left, val)
+				if (val.focus.x <= node.val.focus.x){
+					console.log("not eq less")
+					return searchVal(node.left, val)
 				}
 				else{
-					return search(node.right, val)
+					console.log("not eq more")
+					console.log(node)
+					console.log(val)
+					return searchVal(node.right, val)
 				}
 			}
 		}
 	}
-	// function searchRange(node, val){
-	// 	if(node.val === val){
-	// 		return node
-	// 	}
-	// 	else{
-	// 	}
-	// }
 	function isLeaf(node){
 		if ((node.left===null) && (node.right===null)){
 			return true
@@ -53,17 +54,6 @@ var BinarySearchTree = (function(){
 			return false
 		}
 	}
-	// function getSiblings(node){
-	// 	if(isLeaf(node) && (node.parent !== null)){
-	// 		//it's the right node, 
-	// 		if (node === node.parent.right){
-	// 			return node.parent.left
-	// 		}
-	// 		else{
-	// 			return node.parent.right
-	// 		}
-	// 	}
-	// }
 	function insertV(pnode, node, val){
 		if (node === null){
 			var newnode = Object.create(Node)
@@ -83,7 +73,7 @@ var BinarySearchTree = (function(){
 					var breakr = 1.0
 					var breakl = -1.0
 				}
-				console.log("at a leaf!")
+				// console.log("at a leaf!")
 				//make a new node that has the breakpoints in them
 				//add the two children
 				// if (val.focus.x <= node.val.focus.x){
@@ -122,7 +112,7 @@ var BinarySearchTree = (function(){
 			}
 			//we're not at a leaf yet, keep traversing
 			else{
-				console.log("not at a leaf i suppose")
+				// console.log("not at a leaf i suppose")
 				//right breakpoint of the left arc at this inner node
 				//left breakpoint of the right arc at this inner node
 				// these should be equal
@@ -131,14 +121,14 @@ var BinarySearchTree = (function(){
 
 				//the site we're trying to insert is left of the breakpoint
 				if (val.focus.x <= bptLArcRight){
-					console.log("less " + node.val[0])
+					// console.log("less " + node.val[0])
 					// console.log(node)
 					node.left = insertV(node, node.left, val)
 				}
 
 				//the site we're inserting is to the right of the breakpoint
 				else{
-					console.log("more " + node.breakpts[0])
+					// console.log("more " + node.breakpts[0])
 					// console.log(node)
 					node.right = insertV(node, node.right, val)
 				}
@@ -187,6 +177,7 @@ var BinarySearchTree = (function(){
 		//if we're at a leaf, we want to check the intersection 
 		if (pnode !== null){
 			//this is a left child node
+			console.log(pnode)
 			if(pnode.val[0] === site){
 				lArc = pnode.val[0]
 				rArc = pnode.val[1]
@@ -207,59 +198,40 @@ var BinarySearchTree = (function(){
 			//this is a right child node, so we need to find its right sibling 
 			else{
 				console.log("going to update with parent node")
-				update(buffer, pnode.parent, pnode.val[1])
+				console.log(buffer)
+				console.log(pnode)
+				if (!isLeaf(pnode.right)){
+					// console.log(this.root)
+					var rnodeLeaf = searchVal(pnode, pnode.val[1])
+					console.log("not a leaf")
+					console.log(rnodeLeaf)
+					update(buffer, rnodeLeaf.parent, rnodeLeaf.val)
+				}
+				else{
+					console.log("a leaf")
+					update(buffer, pnode.parent, pnode.val[1])
+				}
+				// update(buffer, pnode, pnode.val[1])
 				// var cur = pnode
 				// while ((cur.parent !== null) && (cur.parent.val[0] !== node.val)){
 				// 	cur = cur.parent
 				// }
 				// console.log(cur)
 			}
-			// update(node.parent.right)
 		}
 		else{
 			if (site != null){
+				console.log("inner site")
 				console.log(site)
 				var arcBuf = site.update(-1.0, 1.0)
+				console.log("pushing into buffer " + site.focus.x)
 				buffer.push(arcBuf)
 			}
 			console.log("no parent")
+			console.log(buffer)
 			return buffer
 		}
 	}
-		// if (isLeaf(node)){
-		// 	//get the arcs to the left and right
-		// 	// var leftArc = getLeftSibling(node)
-		// 	// var rightArc = getRightSibling(node)
-		// 	//get the parent's current breakpoints
-		// 	if (node.parent !== null){
-		// 		// var breakr = node.parent.val[1][1]
-		// 		// var breakl = node.parent.val[1][0]
-		// 		if (node.parent.right !== null){
-		// 			var nbpts = node.val.intersect(node.parent.right.val)
-		// 			//update right breakpoint of left arc
-		// 			node.parent.breakpts[0][1] = nbpts[0]
-
-		// 			//update left & right breakpoints of right arc
-		// 			node.parent.breakpts[1][0] = nbpts[0]
-		// 			node.parent.breakpts[1][1] = nbpts[1]
-		// 		}
-		// 		else if(node.parent.left !==null){
-		// 			var nbpts node.val.intersect(node.parent.left.val)
-		// 			//update left breakpoint of right arc
-		// 			node.parent.breakpts[1][0] = nbpts[0]
-
-		// 			//update left & right breakpoints of left arc
-		// 			node.parent.breakpts[0][0] = nbpts[0]
-		// 			node.parent.breakpts[0][1] = nbpts[1]
-		// 		}
-		// 		else{
-		// 			console.log("the only node at this leaf!")
-		// 		}
-		// 	}
-		// 	else{
-		// 		// breakr = 1.0
-		// 		// breakl = -1.0
-		// 	}
 	function remove(val){
 		
 	}
@@ -277,9 +249,6 @@ var BinarySearchTree = (function(){
 			outputTree(node.right) 
 		}
 	}
-	// function getLeaves(){
-
-	// }
 	return{
 		init: function(val){
 			this.root = init(val)
@@ -296,14 +265,16 @@ var BinarySearchTree = (function(){
 				insertV(null, this.root, val)
 			}
 		},
-		root: this.root,
+		// root: this.root,
 		toBuffer: function(){
 			var cur = this.root
 			var buf = []
 			while ((cur != null) && (cur.left !== null)){
 				cur = cur.left
 			}
-			buf = update(buf, cur.parent, cur.val)
+			buf = update([], cur.parent, cur.val)
+			console.log("bufff")
+			console.log(this.root)
 			return buf
 		},
 		// postOrder: function(){

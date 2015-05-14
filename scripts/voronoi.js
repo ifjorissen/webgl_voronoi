@@ -18,15 +18,9 @@ var Beach = {
     var j = beach.focus.y
 
     var breakpts = []
-    //set the two equations equal and solving for x gives you this monster (thx, wolfram)
+    //set the two equations equal and solving for x gives you this monster (thx, wolfram alpha)
     var x1 = ((-1) * (Math.sqrt((-b*c+b*j+c*c - c*j)*(a*a - 2*a*h + b*b - 2*b*j + h*h + j*j))) + a*c-a*j + b*h - c*h)/(b-j)
     var x2 = ((Math.sqrt((-b*c+b*j+c*c - c*j)*(a*a - 2*a*h + b*b - 2*b*j + h*h + j*j))) + a*c-a*j + b*h - c*h)/(b-j)
-
-    // var x1 = (-1*Math.sqrt((-b*c + b*j+c*c-c*j)*(a*a - 2*a*h + b*b - 2*b*j + h*h + j*j)) + a*c - a*j + b*h - c*h)/(b-j)
-    // var x2 = (Math.sqrt((-b*c + b*j+c*c-c*j )*(a*a - 2*a*h + b*b - 2*b*j + h*h + j*j)) + a*c - a*j + b*h - c*h)/(b-j)
-    console.log((-b*c+b*j+c*c - c*j)*(a*a - 2*a*h + b*b - 2*b*j + h*h + j*j))
-    console.log(a*c-a*j + b*h - c*h)
-    console.log((b-j))
 
     if(isNaN(x1)){
       x1 = 0.0
@@ -34,9 +28,6 @@ var Beach = {
     if(isNaN(x2)){
       x2 = 0.0
     }
-
-    // console.log(x1)
-    // console.log(x2)
     if((x1 >= h) && (x1 <= a)){
       // console.log("inner bkpt")
       breakpts.push(x1, x2)
@@ -44,15 +35,6 @@ var Beach = {
     else{
       breakpts.push(x2, x1)
     }
-    // console.log(this.arceqn(x1))
-    // console.log(this.arceqn(x2))
-    // console.log(beach.arceqn(x1))
-    // console.log(beach.arceqn(x2))
-    // this.bleft = x1
-    // this.bright = x2
-    // beach.bleft = x2
-    // console.log(a)
-    // console.log(h)
     return breakpts
   }, 
 
@@ -70,16 +52,13 @@ var Beach = {
   },
 
   update: function(bl, br){
-    // console.log("beach update " + this.focus.x)
     var arcBuf = []
     var cBuf = []
     var c = this.focus.c
-    // this.arcpts = []
+
     if (this.focus.y >= this.directrix.y){
       for(i = bl; i<br; i+=.01){
         var y = this.arceqn(i)
-        // console.log("x: " + i + " y: " + y)
-        // this.arcpts.push(y)
         cBuf.push(c[0], c[1], c[2])
         arcBuf.push(i, y, 0.0)
       }
@@ -90,7 +69,6 @@ var Beach = {
     }
   },
   toBuffer: function(bl, br){
-    // console.log("beach tobuf " + this.focus.x)
     return this.update(bl, br)
   }
 }
@@ -125,8 +103,6 @@ var Scanline = {
     this.y = this.e1.y
   }
 }
-//To Do:
-// scan function
 var Voronoi = (function(){
   var siteBuffer = []
   var colorBuffer = []
@@ -198,19 +174,9 @@ var Voronoi = (function(){
   }
 
   function beachlineToBuffer(){
-    // var bbuf = []
-
-    // beaches.forEach(function(beach){
-    //   // console.log("beach toBuf " + beach.focus.x)
-    //   var res = beach.toBuffer()
-    //   bbuf.push(res)
-    //   // console.log(bbuf)
-    // })
-    // return bbuf
     var buf = []
     if (beachLine.root != null){
       buf = beachLine.toBuffer()
-      console.log(buf)
     }
     return buf
   }
@@ -223,7 +189,6 @@ var Voronoi = (function(){
       return false
     }
   }
-
   function processEvent(){
     console.log("processEvent")
     var site = pq.pop()
@@ -231,7 +196,7 @@ var Voronoi = (function(){
     beach.init(site, scanline)
     beachLine.insert(beach)
     beaches.push(beach)
-    console.log(beachLine)
+    // console.log(beachLine)
   }
 
   function update(){
@@ -250,24 +215,12 @@ var Voronoi = (function(){
         return b.dist2scan - a.dist2scan
       })
 
+      //process a site event if the scanline has hit a site
       if ((pq.length > 0) && (pq[pq.length-1].dist2scan <= Math.abs(scanline.dy/2))){
         console.log("site event")
         processEvent()
       }
-      // beaches.forEach(function(beach){
-      //   // console.log("update beach " + beach.focus.x)
-      //   beach.update()
-      // })
     }
-  }
-
-  function scan(){
-  	/*
-  	  Fortune's Algorithm
-  	  sweep line moves from the top to the bottom of the diagram
-      O(n*logn)
-  	*/
-    // console.log("scan called")
   }
   return{
     siteBuffer: siteBuffer,
@@ -276,17 +229,16 @@ var Voronoi = (function(){
     scanlineToBuffer: scanlineToBuffer,
     beachlineToBuffer: beachlineToBuffer,
     update: update,
-    scan: scan,
     begin: function(){
       createScanLine()
-    },
-    toGLBuf: function(){
-      scanlineToBuffer()
-      eventToBuffer()
-      beachLineToBuffer()
     }
+    // toGLBuf: function(){
+    //   scanlineToBuffer()
+    //   eventToBuffer()
+    //   beachLineToBuffer()
+    // }
   }
-})()
+})
 
 
 module.exports = Voronoi

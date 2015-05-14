@@ -75,6 +75,10 @@ window.onload = function init (){
 	var reset_btn = document.getElementById("reset")
 	reset_btn.addEventListener("click", function(){
 		console.log("should reset")
+		pause_btn.innerText = "Pause"
+		gen_btn.innerText = "Generate Diagram"
+		webgl.reset()
+		webgl.tick()
 	})
 
 	var pause_btn = document.getElementById("pause")

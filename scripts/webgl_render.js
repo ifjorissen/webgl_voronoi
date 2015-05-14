@@ -2,6 +2,7 @@ var Voronoi = require("./voronoi")
 var Point = require("./point")
 var Vector = require("./vector")
 
+//this & webgl should all be one objcet, probably.
 var Context =  {
   addToDom: function(container_id, canvas_id) {
     this.canvas = document.createElement("canvas")
@@ -24,7 +25,7 @@ var WebGl = (function WebGlModule() {
   var line_shader = null
   var point_shader = null
 
-  var voronoi =  Object.create(Voronoi)
+  var voronoi =  Object.create(Voronoi())
   var gl
   var element = Object.create(Context)
   function init() {
@@ -72,18 +73,18 @@ var WebGl = (function WebGlModule() {
   }
   function startVoronoi(){
     scan = true
-    voronoi.scan()
-
     draw()
   }
   function addPoint(x,y){
+    console.log("add pt")
+    console.log(this)
     if (!scan){
+      console.log("added site")
       voronoi.addSite(x, y, 0.0)
       draw()
     }
   }
   function tick(){
-    // console.log("tick")
     if(scan){
       voronoi.update()
     }
@@ -157,6 +158,7 @@ var WebGl = (function WebGlModule() {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW)
     gl.vertexAttribPointer(colorAL, 3, gl.FLOAT, false, 0, 0)
     gl.lineWidth(5)
+
     //Draw the scanline
     gl.drawArrays(gl.LINES, 0, 2)
     gl.disableVertexAttribArray(vertBuf)
@@ -170,7 +172,14 @@ var WebGl = (function WebGlModule() {
       drawScanline()
       drawBeachLine()
     }
-    // console.log("draw called")
+  }
+  function reset(){
+    //reset scan variable, remove all references to voronoi, and create a new one
+    scan = false
+    voronoi = null
+    delete(voronoi)
+    voronoi = Object.create(Voronoi())
+    voronoi.begin()
   }
 
   return{
@@ -188,6 +197,7 @@ var WebGl = (function WebGlModule() {
     resize: resize,
     tick: tick,
     scan: startVoronoi,
+    reset: reset,
   }
 })();
 
