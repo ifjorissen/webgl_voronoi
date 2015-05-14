@@ -13,5 +13,10 @@ To run locally:
 `npm install`
 `node beefy.js`
 
+(If the changes made in index.js aren't being reflected in the browser, make sure the script in index.html is scripts/index.js)
+
+To make a new bundle file:
+`browserify scripts/index.js>scripts/bundle.js -t brfs`
+
 point your browser to localhost:9966
 
