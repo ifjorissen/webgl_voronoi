@@ -6,15 +6,55 @@ var BST = require("./binary_search_tree")["BinarySearchTree"]
 
 var Beach = {
   init: function(site, scanline){
-    this.breakl = Object.create(Point)
-    this.breakl.init(-1.0, 1.0)
-
-    this.breakr = Object.create(Point)
-    this.breakr.init(1.0, 1.0)
-
     this.directrix = scanline
     this.focus = site
   },
+
+  intersect: function(beach){
+    var a = this.focus.x
+    var b = this.focus.y
+    var c = this.directrix.y
+    var h = beach.focus.x
+    var j = beach.focus.y
+
+    var breakpts = []
+    //set the two equations equal and solving for x gives you this monster (thx, wolfram)
+    var x1 = ((-1) * (Math.sqrt((-b*c+b*j+c*c - c*j)*(a*a - 2*a*h + b*b - 2*b*j + h*h + j*j))) + a*c-a*j + b*h - c*h)/(b-j)
+    var x2 = ((Math.sqrt((-b*c+b*j+c*c - c*j)*(a*a - 2*a*h + b*b - 2*b*j + h*h + j*j))) + a*c-a*j + b*h - c*h)/(b-j)
+
+    // var x1 = (-1*Math.sqrt((-b*c + b*j+c*c-c*j)*(a*a - 2*a*h + b*b - 2*b*j + h*h + j*j)) + a*c - a*j + b*h - c*h)/(b-j)
+    // var x2 = (Math.sqrt((-b*c + b*j+c*c-c*j )*(a*a - 2*a*h + b*b - 2*b*j + h*h + j*j)) + a*c - a*j + b*h - c*h)/(b-j)
+    console.log((-b*c+b*j+c*c - c*j)*(a*a - 2*a*h + b*b - 2*b*j + h*h + j*j))
+    console.log(a*c-a*j + b*h - c*h)
+    console.log((b-j))
+
+    if(isNaN(x1)){
+      x1 = 0.0
+    }
+    if(isNaN(x2)){
+      x2 = 0.0
+    }
+
+    // console.log(x1)
+    // console.log(x2)
+    if((x1 >= h) && (x1 <= a)){
+      // console.log("inner bkpt")
+      breakpts.push(x1, x2)
+    }
+    else{
+      breakpts.push(x2, x1)
+    }
+    // console.log(this.arceqn(x1))
+    // console.log(this.arceqn(x2))
+    // console.log(beach.arceqn(x1))
+    // console.log(beach.arceqn(x2))
+    // this.bleft = x1
+    // this.bright = x2
+    // beach.bleft = x2
+    // console.log(a)
+    // console.log(h)
+    return breakpts
+  }, 
 
   arceqn: function(x){
     var a = this.focus.x
@@ -25,22 +65,21 @@ var Beach = {
     Std vertex form for a parabola: y = a(x-h)^2 + k for a parabola with a vertex (h,k)
     */
     var y = (1/(2*(b-c))) * ((x-a)*(x-a)) + (1/2)*(b+c)
-    // var y = ((x-a)*(x-a) + b*b - c*c)/(2*(b-c))
-    // var y = (a*a - 2*a*x + b*b - c*c + x*x)/(2*b - 2*c)
+
     return y
   },
 
-  update: function(){
+  update: function(bl, br){
     // console.log("beach update " + this.focus.x)
     var arcBuf = []
     var cBuf = []
     var c = this.focus.c
-    this.arcpts = []
+    // this.arcpts = []
     if (this.focus.y >= this.directrix.y){
-      for(i = this.breakl.x; i<this.breakr.x; i+=.01){
+      for(i = bl; i<br; i+=.01){
         var y = this.arceqn(i)
         // console.log("x: " + i + " y: " + y)
-        this.arcpts.push(y)
+        // this.arcpts.push(y)
         cBuf.push(c[0], c[1], c[2])
         arcBuf.push(i, y, 0.0)
       }
@@ -50,9 +89,9 @@ var Beach = {
       "color": cBuf
     }
   },
-  toBuffer: function(){
+  toBuffer: function(bl, br){
     // console.log("beach tobuf " + this.focus.x)
-    return this.update()
+    return this.update(bl, br)
   }
 }
 
@@ -112,12 +151,6 @@ var Voronoi = (function(){
     return colors[(Math.random()*colors.length)|0]
   }
 
-  // function updateBreakpoints(){
-  //   beaches.forEach(function(beach){
-  //     beachLine.search(beach.focus.x)
-  //   })
-  // }
-
   function addSite(x,y,z){
     var p = Object.create(Point)
     p.init(x, y, z)
@@ -165,16 +198,21 @@ var Voronoi = (function(){
   }
 
   function beachlineToBuffer(){
-    var bbuf = []
-    console.log(beaches)
+    // var bbuf = []
 
-    beaches.forEach(function(beach){
-      // console.log("beach toBuf " + beach.focus.x)
-      var res = beach.toBuffer()
-      bbuf.push(res)
-      // console.log(bbuf)
-    })
-    return bbuf
+    // beaches.forEach(function(beach){
+    //   // console.log("beach toBuf " + beach.focus.x)
+    //   var res = beach.toBuffer()
+    //   bbuf.push(res)
+    //   // console.log(bbuf)
+    // })
+    // return bbuf
+    var buf = []
+    if (beachLine.root != null){
+      buf = beachLine.toBuffer()
+      console.log(buf)
+    }
+    return buf
   }
   function scanFinished(){
     if (scanline.y < (-1.0 - scanline.dy)){
@@ -191,8 +229,9 @@ var Voronoi = (function(){
     var site = pq.pop()
     var beach = Object.create(Beach)
     beach.init(site, scanline)
-    beachLine.insert(beach, beach.focus.x)
+    beachLine.insert(beach)
     beaches.push(beach)
+    console.log(beachLine)
   }
 
   function update(){
@@ -202,7 +241,6 @@ var Voronoi = (function(){
 
       //update every site's distance
       sites.forEach(function(site){
-        // console.log("update sites func " + site.x)
         site.update(scanline)
       })
 
@@ -216,11 +254,10 @@ var Voronoi = (function(){
         console.log("site event")
         processEvent()
       }
-
-      beaches.forEach(function(beach){
-        // console.log("update beach " + beach.focus.x)
-        beach.update()
-      })
+      // beaches.forEach(function(beach){
+      //   // console.log("update beach " + beach.focus.x)
+      //   beach.update()
+      // })
     }
   }
 
