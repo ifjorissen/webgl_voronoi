@@ -11,13 +11,16 @@ var Node = {
 
 
 var BinarySearchTree = (function(){
+	var root = Object.create(Node)
 	function init(val){
-		var newnode = Object.create(Node)
-		newnode.init(null, val)
-		return newnode
+		// var newnode = Object.create(Node)
+		// newnode.init(null, val)
+		root.init(null, val)
+		// return newnode
 	}
 	/*
-	Searches for the node at an expected value
+	Search: given a start node and a val, searches the appropriate subtree(s) and returns 
+	the node associated with that value (if there is one)
 	*/
 	function searchVal(node, val){
 		console.log("search")
@@ -33,8 +36,14 @@ var BinarySearchTree = (function(){
 				return node
 			}
 			else{
-				if (val.focus.x <= node.val.focus.x){
+				if(isLeaf(node)){
+					console.log("this is a leaf tho")
+				}
+				if (val.focus.x <= node.breakpts[1][0]){
 					console.log("not eq less")
+					console.log("not eq less")
+					console.log(node.breakpts)
+					console.log(node.val[0].focus.x)
 					return searchVal(node.left, val)
 				}
 				else{
@@ -61,9 +70,11 @@ var BinarySearchTree = (function(){
 			return newnode
 		}
 		else{
-			//replace this leaf with a 3 node subtree
-			//if the site is to the left of the node's site, we need to check its right 
-			//breakpoint with the nodes left breakpoint and update it (there's more to this)
+			/*
+				replace this leaf with a 3 node subtree
+			  if the site is to the left of the node's site, we need to check its right 
+		    breakpoint with the nodes left breakpoint and update it (there's more to this)
+		  */
 			if(isLeaf(node)){
 				if (node.parent !== null){
 					var breakr = node.parent.val[1][1]
@@ -73,10 +84,8 @@ var BinarySearchTree = (function(){
 					var breakr = 1.0
 					var breakl = -1.0
 				}
-				// console.log("at a leaf!")
 				//make a new node that has the breakpoints in them
 				//add the two children
-				// if (val.focus.x <= node.val.focus.x){
 				var valbpts = val.intersect(node.val)
 				var nodebpts = [valbpts[0], breakr]
 				var breakpts = [valbpts, nodebpts]
@@ -93,15 +102,12 @@ var BinarySearchTree = (function(){
 				//insert the old
 				node.right.left = insertV(node.right, node.right.left, val)
 				node.right.right = insertV(node.right, node.right.right, node.val)
-			// }
-			//the arc we want to add should be on the right
-			// else if (val.focus.x > node.val.focus.x){
+
+				//the arc we want to add should be on the right
+				// else if (val.focus.x > node.val.focus.x){
 				// node.val.intersect(val)
 				node.left = insertV(node, node.left, node.val)
-				// }
-				// else{
-				// 	console.log("what")
-				// }
+
 
 				//the breakpoints for the nodes right and the beach's left
 				// console.log(node.val)
@@ -112,9 +118,6 @@ var BinarySearchTree = (function(){
 			}
 			//we're not at a leaf yet, keep traversing
 			else{
-				// console.log("not at a leaf i suppose")
-				//right breakpoint of the left arc at this inner node
-				//left breakpoint of the right arc at this inner node
 				// these should be equal
 				var bptRArcLeft = node.breakpts[0][1] //the right breakpoint of the left arc
 				var bptLArcRight = node.breakpts[1][0] //the left breakpoint of the right arc
@@ -198,11 +201,11 @@ var BinarySearchTree = (function(){
 			//this is a right child node, so we need to find its right sibling 
 			else{
 				console.log("going to update with parent node")
-				console.log(buffer)
-				console.log(pnode)
+				// console.log(buffer)
+				// console.log(pnode)
 				if (!isLeaf(pnode.right)){
-					// console.log(this.root)
-					var rnodeLeaf = searchVal(pnode, pnode.val[1])
+					console.log(root)
+					var rnodeLeaf = searchVal(root, pnode.val[1])
 					console.log("not a leaf")
 					console.log(rnodeLeaf)
 					update(buffer, rnodeLeaf.parent, rnodeLeaf.val)
@@ -251,7 +254,10 @@ var BinarySearchTree = (function(){
 	}
 	return{
 		init: function(val){
-			this.root = init(val)
+			console.log(init)
+			init(val)
+			console.log(root)
+			this.root = root
 		},
 		searchVal: function(val){
 			var res = search(this.root, val)
@@ -259,7 +265,9 @@ var BinarySearchTree = (function(){
 		},
 		insert: function(val){
 			if (this.root == null){
-				this.root = init(val)
+				init(val)
+				this.root = root
+				// this.root = init(val)
 			}
 			else{
 				insertV(null, this.root, val)

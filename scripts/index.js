@@ -65,7 +65,6 @@ window.onload = function init (){
 
 	var gen_btn = document.getElementById("generate")
 	gen_btn.addEventListener("click", function(){
-		// console.log("start diagram generation")
 		gen_btn.innerText = "Generating Diagram ...."
 		pause_btn.innerText = "Pause"
 		pause = false
@@ -74,7 +73,6 @@ window.onload = function init (){
 
 	var reset_btn = document.getElementById("reset")
 	reset_btn.addEventListener("click", function(){
-		console.log("should reset")
 		pause_btn.innerText = "Pause"
 		gen_btn.innerText = "Generate Diagram"
 		webgl.reset()
@@ -83,7 +81,6 @@ window.onload = function init (){
 
 	var pause_btn = document.getElementById("pause")
 	pause_btn.addEventListener("click", function(){
-		// console.log("should pause")
 		pause_btn.innerText = "Paused"
 		gen_btn.innerText = "Resume"
 		pause = true

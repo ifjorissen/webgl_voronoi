@@ -76,10 +76,7 @@ var WebGl = (function WebGlModule() {
     draw()
   }
   function addPoint(x,y){
-    console.log("add pt")
-    console.log(this)
     if (!scan){
-      console.log("added site")
       voronoi.addSite(x, y, 0.0)
       draw()
     }

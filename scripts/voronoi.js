@@ -23,18 +23,19 @@ var Beach = {
     var x2 = ((Math.sqrt((-b*c+b*j+c*c - c*j)*(a*a - 2*a*h + b*b - 2*b*j + h*h + j*j))) + a*c-a*j + b*h - c*h)/(b-j)
 
     if(isNaN(x1)){
-      x1 = 0.0
+      x1 = -1.0
     }
     if(isNaN(x2)){
-      x2 = 0.0
+      x2 = 1.0
     }
-    if((x1 >= h) && (x1 <= a)){
-      // console.log("inner bkpt")
-      breakpts.push(x1, x2)
-    }
-    else{
-      breakpts.push(x2, x1)
-    }
+    breakpts.push(x1, x2)
+    // if((x1 >= h) && (x1 <= a)){
+    //   // console.log("inner bkpt")
+    //   breakpts.push(x1, x2)
+    // }
+    // else{
+    //   breakpts.push(x2, x1)
+    // }
     return breakpts
   }, 
 
