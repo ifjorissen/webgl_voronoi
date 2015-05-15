@@ -28,14 +28,14 @@ var Beach = {
     if(isNaN(x2)){
       x2 = 1.0
     }
-    breakpts.push(x1, x2)
-    // if((x1 >= h) && (x1 <= a)){
-    //   // console.log("inner bkpt")
-    //   breakpts.push(x1, x2)
-    // }
-    // else{
-    //   breakpts.push(x2, x1)
-    // }
+    // breakpts.push(x1, x2)
+    if((x1 >= h) && (x1 <= a)){
+      // console.log("inner bkpt")
+      breakpts.push(x2, x1)
+    }
+    else{
+      breakpts.push(x1, x2)
+    }
     return breakpts
   }, 
 
