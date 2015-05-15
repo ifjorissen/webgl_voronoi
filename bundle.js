@@ -12,13 +12,17 @@ var Node = {
 
 
 var BinarySearchTree = (function(){
+	var root = Object.create(Node)
+	var beachLineBuffer = []
 	function init(val){
-		var newnode = Object.create(Node)
-		newnode.init(null, val)
-		return newnode
+		// var newnode = Object.create(Node)
+		// newnode.init(null, val)
+		root.init(null, val)
+		// return newnode
 	}
 	/*
-	Searches for the node at an expected value
+	SearchVal: given a start node and a val, searches the appropriate subtree(s) and returns 
+	the node associated with that value (if there is one) I BROKE THIS
 	*/
 	function searchVal(node, val){
 		console.log("search")
@@ -34,8 +38,14 @@ var BinarySearchTree = (function(){
 				return node
 			}
 			else{
-				if (val.focus.x <= node.val.focus.x){
+				if(isLeaf(node)){
+					console.log("this is a leaf tho")
+				}
+				if (val.focus.x <= node.breakpts[1][0]){
 					console.log("not eq less")
+					console.log("not eq less")
+					console.log(node.breakpts)
+					console.log(node.val[0].focus.x)
 					return searchVal(node.left, val)
 				}
 				else{
@@ -47,6 +57,9 @@ var BinarySearchTree = (function(){
 			}
 		}
 	}
+	/*
+		Checks to see if a given node is a leaf
+	*/
 	function isLeaf(node){
 		if ((node.left===null) && (node.right===null)){
 			return true
@@ -55,6 +68,9 @@ var BinarySearchTree = (function(){
 			return false
 		}
 	}
+	/*
+		Inserts a value into the BST based off of the stored breakpoints in the internal nodes
+	*/
 	function insertV(pnode, node, val){
 		if (node === null){
 			var newnode = Object.create(Node)
@@ -62,9 +78,11 @@ var BinarySearchTree = (function(){
 			return newnode
 		}
 		else{
-			//replace this leaf with a 3 node subtree
-			//if the site is to the left of the node's site, we need to check its right 
-			//breakpoint with the nodes left breakpoint and update it (there's more to this)
+			/*
+				replace this leaf with a 3 node subtree
+			  if the site is to the left of the node's site, we need to check its right 
+		    breakpoint with the nodes left breakpoint and update it (there's more to this)
+		  */
 			if(isLeaf(node)){
 				if (node.parent !== null){
 					var breakr = node.parent.val[1][1]
@@ -74,10 +92,8 @@ var BinarySearchTree = (function(){
 					var breakr = 1.0
 					var breakl = -1.0
 				}
-				// console.log("at a leaf!")
 				//make a new node that has the breakpoints in them
 				//add the two children
-				// if (val.focus.x <= node.val.focus.x){
 				var valbpts = val.intersect(node.val)
 				var nodebpts = [valbpts[0], breakr]
 				var breakpts = [valbpts, nodebpts]
@@ -94,15 +110,12 @@ var BinarySearchTree = (function(){
 				//insert the old
 				node.right.left = insertV(node.right, node.right.left, val)
 				node.right.right = insertV(node.right, node.right.right, node.val)
-			// }
-			//the arc we want to add should be on the right
-			// else if (val.focus.x > node.val.focus.x){
+
+				//the arc we want to add should be on the right
+				// else if (val.focus.x > node.val.focus.x){
 				// node.val.intersect(val)
 				node.left = insertV(node, node.left, node.val)
-				// }
-				// else{
-				// 	console.log("what")
-				// }
+
 
 				//the breakpoints for the nodes right and the beach's left
 				// console.log(node.val)
@@ -113,9 +126,6 @@ var BinarySearchTree = (function(){
 			}
 			//we're not at a leaf yet, keep traversing
 			else{
-				// console.log("not at a leaf i suppose")
-				//right breakpoint of the left arc at this inner node
-				//left breakpoint of the right arc at this inner node
 				// these should be equal
 				var bptRArcLeft = node.breakpts[0][1] //the right breakpoint of the left arc
 				var bptLArcRight = node.breakpts[1][0] //the left breakpoint of the right arc
@@ -139,100 +149,111 @@ var BinarySearchTree = (function(){
 		}
 	}
 
-	function insert(pnode, node, key, val){
-		if (node === null){
-			console.log(pnode)
-			var newnode = Object.create(Node)
-			newnode.init(pnode, key, val)
-			console.log(newnode)
-			return newnode
-		}
-		else{
-			if (val <= node.val){
-				console.log("less " + node.val)
-				// console.log(node)
-				node.left = insert(node, node.left, key, val)
-			}
-			else{
-				console.log("more " + node.val)
-				// console.log(node)
-				node.right = insert(node, node.right, key, val)
-			}
-			console.log(node)
-			return node
-		}
-	}
-	// function getLeftSiblingLeaf(node){
-	// 	if (node.parent !== null){
-	// 		if(node.parent.left === node){
-	// 			//we need to keep going up until we find a leaf
-	// 			getLeftSibling(node.parent)
+	// function insert(pnode, node, key, val){
+	// 	if (node === null){
+	// 		console.log(pnode)
+	// 		var newnode = Object.create(Node)
+	// 		newnode.init(pnode, key, val)
+	// 		console.log(newnode)
+	// 		return newnode
+	// 	}
+	// 	else{
+	// 		if (val <= node.val){
+	// 			console.log("less " + node.val)
+	// 			// console.log(node)
+	// 			node.left = insert(node, node.left, key, val)
 	// 		}
 	// 		else{
-	// 			var cur = node.parent.left
+	// 			console.log("more " + node.val)
+	// 			// console.log(node)
+	// 			node.right = insert(node, node.right, key, val)
 	// 		}
+	// 		console.log(node)
+	// 		return node
 	// 	}
 	// }
-	function update(buffer, pnode, site){
-		//traverse the binary tree, updating breakpoints and returning the buffer
-		//if we're at a leaf, we want to check the intersection 
-		if (pnode !== null){
-			//this is a left child node
-			console.log(pnode)
-			if(pnode.val[0] === site){
-				lArc = pnode.val[0]
-				rArc = pnode.val[1]
-				var nbpts = lArc.intersect(rArc)
-				//update right breakpoint of left arc
-				pnode.breakpts[0][1] = nbpts[0]
+	function update(node){
+		if(!isLeaf(node)){
+			lArc = node.val[0]
+			rArc = node.val[1]
+			var nbpts = lArc.intersect(rArc)
 
-				//update left & right breakpoints of right arc
-				pnode.breakpts[1][0] = nbpts[0]
-				pnode.breakpts[1][1] = nbpts[1]
+			//update right breakpoint of left arc
+			node.breakpts[0][1] = nbpts[0]
 
-				console.log("pushing into buffer " + lArc.focus.x)
-				var lArcBuf = lArc.update(pnode.breakpts[0][0], pnode.breakpts[0][1])
-				buffer.push(lArcBuf)
-				//update the right sibling
-				update(buffer, pnode, pnode.val[1])
-			}
-			//this is a right child node, so we need to find its right sibling 
-			else{
-				console.log("going to update with parent node")
-				console.log(buffer)
-				console.log(pnode)
-				if (!isLeaf(pnode.right)){
-					// console.log(this.root)
-					var rnodeLeaf = searchVal(pnode, pnode.val[1])
-					console.log("not a leaf")
-					console.log(rnodeLeaf)
-					update(buffer, rnodeLeaf.parent, rnodeLeaf.val)
-				}
-				else{
-					console.log("a leaf")
-					update(buffer, pnode.parent, pnode.val[1])
-				}
-				// update(buffer, pnode, pnode.val[1])
-				// var cur = pnode
-				// while ((cur.parent !== null) && (cur.parent.val[0] !== node.val)){
-				// 	cur = cur.parent
-				// }
-				// console.log(cur)
-			}
+			//update left & right breakpoints of right arc
+			node.breakpts[1][0] = nbpts[0]
+			node.breakpts[1][1] = nbpts[1]
+			update(node.left)
+			update(node.right)
 		}
 		else{
-			if (site != null){
-				console.log("inner site")
-				console.log(site)
-				var arcBuf = site.update(-1.0, 1.0)
-				console.log("pushing into buffer " + site.focus.x)
-				buffer.push(arcBuf)
+			var lArcBuf = []
+			if(node.parent !== null){
+				lArcBuf = node.val.update(node.parent.breakpts[0][0], node.parent.breakpts[0][1])
 			}
-			console.log("no parent")
-			console.log(buffer)
-			return buffer
+			else{
+				lArcBuf = node.val.update(-1.0, 1.0)
+			}
+			beachLineBuffer.push(lArcBuf)
+			// console.log(buffer)
 		}
 	}
+	// function update(buffer, pnode, site){
+	// 	//traverse the binary tree, updating breakpoints and returning the buffer
+	// 	//if we're at a leaf, we want to check the intersection 
+	// 	if (pnode !== null){
+	// 		//this is a left child node
+	// 		console.log(pnode)
+	// 		if(pnode.val[0] === site){
+	// 			lArc = pnode.val[0]
+	// 			rArc = pnode.val[1]
+	// 			var nbpts = lArc.intersect(rArc)
+	// 			console.log(nbpts)
+	// 			//update right breakpoint of left arc
+	// 			pnode.breakpts[0][1] = nbpts[0]
+
+	// 			//update left & right breakpoints of right arc
+	// 			pnode.breakpts[1][0] = nbpts[0]
+	// 			pnode.breakpts[1][1] = nbpts[1]
+
+	// 			console.log("pushing into buffer " + lArc.focus.x)
+	// 			var lArcBuf = lArc.update(pnode.breakpts[0][0], pnode.breakpts[0][1])
+	// 			buffer.push(lArcBuf)
+	// 			//update the right sibling
+	// 			update(buffer, pnode, pnode.val[1])
+	// 		}
+	// 		//this is a right child node, so we need to find its right sibling 
+	// 		else{
+	// 			console.log("going to update with parent node")
+	// 			// console.log(buffer)
+	// 			// console.log(pnode)
+	// 			if (!isLeaf(pnode.right)){
+	// 				console.log(root)
+	// 				var rnodeLeaf = searchVal(root, pnode.val[1])
+	// 				console.log("not a leaf")
+	// 				console.log(rnodeLeaf)
+	// 				update(buffer, rnodeLeaf.parent, rnodeLeaf.val)
+	// 			}
+	// 			else{
+	// 				console.log("a leaf")
+	// 				update(buffer, pnode.parent, pnode.val[1])
+	// 			}
+	// 		}
+	// 	}
+	// 	else{
+	// 		if (site != null){
+	// 			console.log("inner site")
+	// 			console.log(site)
+	// 			var arcBuf = site.update(-1.0, 1.0)
+	// 			console.log("pushing into buffer " + site.focus.x)
+	// 			buffer.push(arcBuf)
+	// 		}
+	// 		console.log("no parent")
+	// 		console.log(buffer)
+	// 		return buffer
+	// 	}
+	// }
 	function remove(val){
 		
 	}
@@ -252,7 +273,10 @@ var BinarySearchTree = (function(){
 	}
 	return{
 		init: function(val){
-			this.root = init(val)
+			console.log(init)
+			init(val)
+			console.log(root)
+			this.root = root
 		},
 		searchVal: function(val){
 			var res = search(this.root, val)
@@ -260,7 +284,8 @@ var BinarySearchTree = (function(){
 		},
 		insert: function(val){
 			if (this.root == null){
-				this.root = init(val)
+				init(val)
+				this.root = root
 			}
 			else{
 				insertV(null, this.root, val)
@@ -269,19 +294,14 @@ var BinarySearchTree = (function(){
 		// root: this.root,
 		toBuffer: function(){
 			var cur = this.root
-			var buf = []
+			// var buf = []
 			while ((cur != null) && (cur.left !== null)){
 				cur = cur.left
 			}
-			buf = update([], cur.parent, cur.val)
-			console.log("bufff")
-			console.log(this.root)
-			return buf
+			beachLineBuffer = []
+			update(this.root)
+			return beachLineBuffer
 		},
-		// postOrder: function(){
-		// 	console.log("postOrder")
-		// 	postOrder(this.root)
-		// },
 	}
 })();
 
@@ -384,7 +404,6 @@ window.onload = function init (){
 
 	var gen_btn = document.getElementById("generate")
 	gen_btn.addEventListener("click", function(){
-		// console.log("start diagram generation")
 		gen_btn.innerText = "Generating Diagram ...."
 		pause_btn.innerText = "Pause"
 		pause = false
@@ -393,7 +412,6 @@ window.onload = function init (){
 
 	var reset_btn = document.getElementById("reset")
 	reset_btn.addEventListener("click", function(){
-		console.log("should reset")
 		pause_btn.innerText = "Pause"
 		gen_btn.innerText = "Generate Diagram"
 		webgl.reset()
@@ -402,7 +420,6 @@ window.onload = function init (){
 
 	var pause_btn = document.getElementById("pause")
 	pause_btn.addEventListener("click", function(){
-		// console.log("should pause")
 		pause_btn.innerText = "Paused"
 		gen_btn.innerText = "Resume"
 		pause = true
@@ -608,17 +625,18 @@ var Beach = {
     var x2 = ((Math.sqrt((-b*c+b*j+c*c - c*j)*(a*a - 2*a*h + b*b - 2*b*j + h*h + j*j))) + a*c-a*j + b*h - c*h)/(b-j)
 
     if(isNaN(x1)){
-      x1 = 0.0
+      x1 = -1.0
     }
     if(isNaN(x2)){
-      x2 = 0.0
+      x2 = 1.0
     }
+    // breakpts.push(x1, x2)
     if((x1 >= h) && (x1 <= a)){
       // console.log("inner bkpt")
-      breakpts.push(x1, x2)
+      breakpts.push(x2, x1)
     }
     else{
-      breakpts.push(x2, x1)
+      breakpts.push(x1, x2)
     }
     return breakpts
   }, 
@@ -906,10 +924,7 @@ var WebGl = (function WebGlModule() {
     draw()
   }
   function addPoint(x,y){
-    console.log("add pt")
-    console.log(this)
     if (!scan){
-      console.log("added site")
       voronoi.addSite(x, y, 0.0)
       draw()
     }
