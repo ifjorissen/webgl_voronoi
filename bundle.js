@@ -14,11 +14,9 @@ var Node = {
 var BinarySearchTree = (function(){
 	var root = Object.create(Node)
 	var beachLineBuffer = []
+
 	function init(val){
-		// var newnode = Object.create(Node)
-		// newnode.init(null, val)
 		root.init(null, val)
-		// return newnode
 	}
 	/*
 	SearchVal: given a start node and a val, searches the appropriate subtree(s) and returns 
@@ -31,9 +29,6 @@ var BinarySearchTree = (function(){
 			return null
 		}
 		else{
-			console.log("else search")
-			console.log(node)
-			console.log(val)
 			if(val === node.val){
 				return node
 			}
@@ -148,30 +143,6 @@ var BinarySearchTree = (function(){
 			return node
 		}
 	}
-
-	// function insert(pnode, node, key, val){
-	// 	if (node === null){
-	// 		console.log(pnode)
-	// 		var newnode = Object.create(Node)
-	// 		newnode.init(pnode, key, val)
-	// 		console.log(newnode)
-	// 		return newnode
-	// 	}
-	// 	else{
-	// 		if (val <= node.val){
-	// 			console.log("less " + node.val)
-	// 			// console.log(node)
-	// 			node.left = insert(node, node.left, key, val)
-	// 		}
-	// 		else{
-	// 			console.log("more " + node.val)
-	// 			// console.log(node)
-	// 			node.right = insert(node, node.right, key, val)
-	// 		}
-	// 		console.log(node)
-	// 		return node
-	// 	}
-	// }
 	function update(node){
 		if(!isLeaf(node)){
 			lArc = node.val[0]
@@ -188,72 +159,24 @@ var BinarySearchTree = (function(){
 			update(node.right)
 		}
 		else{
-			var lArcBuf = []
+			var arcBuf = []
 			if(node.parent !== null){
-				lArcBuf = node.val.update(node.parent.breakpts[0][0], node.parent.breakpts[0][1])
+				//if it's a left node draw this
+				if(node.val == node.parent.val[0]){
+					arcBuf = node.val.update(node.parent.breakpts[0][0], node.parent.breakpts[0][1])
+				}
+				//if its a right node draw this
+				else{
+					arcBuf = node.val.update(node.parent.breakpts[1][0], node.parent.breakpts[1][1])
+				}
 			}
 			else{
-				lArcBuf = node.val.update(-1.0, 1.0)
+				arcBuf = node.val.update(-1.0, 1.0)
 			}
-			beachLineBuffer.push(lArcBuf)
+			beachLineBuffer.push(arcBuf)
 			// console.log(buffer)
 		}
 	}
-	// function update(buffer, pnode, site){
-	// 	//traverse the binary tree, updating breakpoints and returning the buffer
-	// 	//if we're at a leaf, we want to check the intersection 
-	// 	if (pnode !== null){
-	// 		//this is a left child node
-	// 		console.log(pnode)
-	// 		if(pnode.val[0] === site){
-	// 			lArc = pnode.val[0]
-	// 			rArc = pnode.val[1]
-	// 			var nbpts = lArc.intersect(rArc)
-	// 			console.log(nbpts)
-	// 			//update right breakpoint of left arc
-	// 			pnode.breakpts[0][1] = nbpts[0]
-
-	// 			//update left & right breakpoints of right arc
-	// 			pnode.breakpts[1][0] = nbpts[0]
-	// 			pnode.breakpts[1][1] = nbpts[1]
-
-	// 			console.log("pushing into buffer " + lArc.focus.x)
-	// 			var lArcBuf = lArc.update(pnode.breakpts[0][0], pnode.breakpts[0][1])
-	// 			buffer.push(lArcBuf)
-	// 			//update the right sibling
-	// 			update(buffer, pnode, pnode.val[1])
-	// 		}
-	// 		//this is a right child node, so we need to find its right sibling 
-	// 		else{
-	// 			console.log("going to update with parent node")
-	// 			// console.log(buffer)
-	// 			// console.log(pnode)
-	// 			if (!isLeaf(pnode.right)){
-	// 				console.log(root)
-	// 				var rnodeLeaf = searchVal(root, pnode.val[1])
-	// 				console.log("not a leaf")
-	// 				console.log(rnodeLeaf)
-	// 				update(buffer, rnodeLeaf.parent, rnodeLeaf.val)
-	// 			}
-	// 			else{
-	// 				console.log("a leaf")
-	// 				update(buffer, pnode.parent, pnode.val[1])
-	// 			}
-	// 		}
-	// 	}
-	// 	else{
-	// 		if (site != null){
-	// 			console.log("inner site")
-	// 			console.log(site)
-	// 			var arcBuf = site.update(-1.0, 1.0)
-	// 			console.log("pushing into buffer " + site.focus.x)
-	// 			buffer.push(arcBuf)
-	// 		}
-	// 		console.log("no parent")
-	// 		console.log(buffer)
-	// 		return buffer
-	// 	}
-	// }
 	function remove(val){
 		
 	}
@@ -291,17 +214,15 @@ var BinarySearchTree = (function(){
 				insertV(null, this.root, val)
 			}
 		},
-		// root: this.root,
 		toBuffer: function(){
 			var cur = this.root
-			// var buf = []
 			while ((cur != null) && (cur.left !== null)){
 				cur = cur.left
 			}
 			beachLineBuffer = []
 			update(this.root)
 			return beachLineBuffer
-		},
+		}
 	}
 })();
 
